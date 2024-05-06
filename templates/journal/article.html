@@ -236,9 +236,7 @@
                                                     {{ funder.name }}
                                                 {% endif %}
                                                 {% if funder.funding_id %}
-                                                    {% blocktranslate with id=funder.funding_id %}
-                                                        (grant {{ id }})
-                                                    {% endblocktranslate %}
+                                                    (grant {{ funder.funding_id }})
                                                 {% endif %}
                                             </li>
                                         {% endfor %}
