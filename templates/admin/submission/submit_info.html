@@ -1,0 +1,869 @@
+{% extends "admin/core/base.html" %}
+{% load static from staticfiles %}
+{% load foundation %}
+{% load i18n %}
+{% load field %}
+
+{% block title-section %}{% trans "Article Info" %}{% endblock %}
+{% block css %}
+    <link href="{% static 'admin/css/timeline.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li>Submit an Article</li>
+{% endblock %}
+
+{% block body %}
+    <style>
+        /* Remove default bullets */
+        .tree {
+            list-style-type: none !important;
+            margin-left: 30px;
+        }
+
+        /* Remove margins and padding from the parent ul */
+
+        /* Style the caret/arrow */
+        .caret {
+            cursor: pointer;
+            user-select: none; /* Prevent text selection */
+            margin-left: -20px;
+        }
+
+        /* Create the caret/arrow with a unicode, and style it */
+        .caret::before {
+            content: "\25B6";
+            color: black;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+        .caret-down::before {
+            transform: rotate(90deg);
+        }
+
+        /* Hide the nested list */
+        .nested {
+            display: none;
+            margin-left: 30px;
+        }
+
+        /* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+        .active {
+            display: block;
+        }
+    </style>
+    <article>
+        <div class="box">
+            <form method="POST"{% if journal_settings.general.abstract_required %} novalidate{% endif %}>
+                {% csrf_token %}
+
+                {% if article.is_preprint %}{% trans "This article is a preprint" %}{% endif %}
+                {% include "submission/timeline.html" with data=article %}
+
+                <div class="row expanded">
+                    <div class="title-area">
+                        <h2>{% trans 'Basic Information' %}</h2>
+                    </div>
+                    <div class="content">
+                        {% include "elements/forms/errors.html" with form=form %}
+                        <div class="{% if request.journal.submissionconfiguration.subtitle %}large-6{% else %}large-12{% endif %} columns">
+                            {{ form.title|foundation }}
+                        </div>
+
+                        {% if request.journal.submissionconfiguration.subtitle %}
+                            <div class="large-6 columns">
+                                {{ form.subtitle|foundation }}
+                            </div>
+                        {% endif %}
+
+                        {% if request.journal.submissionconfiguration.abstract %}
+                            <div class="large-12 columns">
+                                {{ form.abstract|foundation }}
+                            </div>
+                        {% endif %}
+                        {% if journal_settings.general.submission_summary %}
+                            <div class="large-12 columns">
+                                {{ form.non_specialist_summary|foundation }}
+                            </div>
+                        {% endif %}
+                        {% if request.journal.submissionconfiguration.language %}
+                            <div class="large-{{ request.journal.submissionconfiguration.lang_section_license_width }} columns">
+                                {{ form.language|foundation }}
+                            </div>
+                        {% endif %}
+
+                        <div class="large-{{ request.journal.submissionconfiguration.lang_section_license_width }} columns end">
+                            {{ form.section|foundation }}
+                        </div>
+
+                        {% if request.journal.submissionconfiguration.license %}
+                            <div class="large-{{ request.journal.submissionconfiguration.lang_section_license_width }} columns error">
+                                {{ form.license|foundation }}
+                                <p class="help-text"><a href="#" data-open="license">{% trans 'View license information' %}</a></p>
+                            </div>
+                        {% endif %}
+
+
+                        {% if request.journal.submissionconfiguration.keywords %}
+                            <div class="large-12 columns">
+                                <div class="row expanded">
+                                    <div class="large-12 columns">
+                                        <label for="id_subject">Keywords<span class="red">*</span></label>
+                                        <ul class="tree">
+
+                                            <li><span class="caret"></span><strong><input type="checkbox" name="subject"
+                                                                                          value="Manage Clinical Research Data">
+                                            </strong> Manage Clinical Research Data
+
+                                                <ul class="nested tree">
+
+                                                    <li><span class="caret"></span><strong><input type="checkbox"
+                                                                                                  name="subject"
+                                                                                                  value="Collect data">
+                                                    </strong> Collect data
+
+                                                        <ul class="nested tree">
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Abstract Data"> Abstract Data
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Measure / Observe"> Measure / Observe
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Record Data"> Record Data
+
+                                                            </li>
+
+                                                        </ul>
+
+                                                    </li>
+
+                                                    <li><span class="caret"></span><strong><input type="checkbox"
+                                                                                                  name="subject"
+                                                                                                  value="Create Database">
+                                                    </strong> Create Database
+
+                                                        <ul class="nested tree">
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Create Screens &amp; Tables"> Create
+                                                                Screens &amp; Tables
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Program Data Validation Checks"> Program
+                                                                Data Validation Checks
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Program Reports"> Program Reports
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Validate Programming"> Validate
+                                                                Programming
+
+                                                            </li>
+
+                                                        </ul>
+
+                                                    </li>
+
+                                                    <li><span class="caret"></span><strong><input type="checkbox"
+                                                                                                  name="subject"
+                                                                                                  value="Define Data">
+                                                    </strong> Define Data
+
+                                                        <ul class="nested tree">
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Data Collection Structure"> Data
+                                                                Collection Structure
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Measurement Method"> Measurement Method
+
+                                                            </li>
+
+                                                            <li><span class="caret"></span><strong><input
+                                                                    type="checkbox" name="subject"
+                                                                    value="Metadata ISO 11179"> </strong> Metadata ISO
+                                                                11179
+
+                                                                <ul class="nested tree">
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="Choose Applicable Standards">
+                                                                        Choose Applicable Standards
+
+                                                                    </li>
+
+                                                                </ul>
+
+                                                            </li>
+
+                                                        </ul>
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject"
+                                                               value="Define / document data handling process"> Define /
+                                                        document data handling process
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject" value="Design Form">
+                                                        Design Form
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject" value="Identify Data">
+                                                        Identify Data
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject"
+                                                               value="Manage Simultaneous Users"> Manage Simultaneous
+                                                        Users
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject"
+                                                               value="Measure Data Quality"> Measure Data Quality
+
+                                                    </li>
+
+                                                    <li><span class="caret"></span><strong><input type="checkbox"
+                                                                                                  name="subject"
+                                                                                                  value="Process Data">
+                                                    </strong> Process Data
+
+                                                        <ul class="nested tree">
+
+                                                            <li><span class="caret"></span><strong><input
+                                                                    type="checkbox" name="subject" value="Clean">
+                                                            </strong> Clean
+
+                                                                <ul class="nested tree">
+
+                                                                    <li><span class="caret"></span><strong><input
+                                                                            type="checkbox" name="subject"
+                                                                            value="Identify Discrepancy"> </strong>
+                                                                        Identify Discrepancy
+
+                                                                        <ul class="nested tree">
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Manual ID"> Manual ID
+
+                                                                            </li>
+
+                                                                            <li><span
+                                                                                    class="caret"></span><strong><input
+                                                                                    type="checkbox" name="subject"
+                                                                                    value="Programmatic ID"> </strong>
+                                                                                Programmatic ID
+
+                                                                                <ul class="nested tree">
+
+                                                                                    <li><span
+                                                                                            class="caret"></span><strong><input
+                                                                                            type="checkbox"
+                                                                                            name="subject"
+                                                                                            value="Interactive (on-screen)">
+                                                                                    </strong> Interactive (on-screen)
+
+                                                                                        <ul class="nested tree">
+
+                                                                                            <li><input type="checkbox"
+                                                                                                       name="subject"
+                                                                                                       value="On Commit">
+                                                                                                On Commit
+
+                                                                                            </li>
+
+                                                                                            <li><input type="checkbox"
+                                                                                                       name="subject"
+                                                                                                       value="On Entry">
+                                                                                                On Entry
+
+                                                                                            </li>
+
+                                                                                        </ul>
+
+                                                                                    </li>
+
+                                                                                    <li><span
+                                                                                            class="caret"></span><strong><input
+                                                                                            type="checkbox"
+                                                                                            name="subject"
+                                                                                            value="Multivariate">
+                                                                                    </strong> Multivariate
+
+                                                                                        <ul class="nested tree">
+
+                                                                                            <li><input type="checkbox"
+                                                                                                       name="subject"
+                                                                                                       value="Cross Table">
+                                                                                                Cross Table
+
+                                                                                            </li>
+
+                                                                                            <li><input type="checkbox"
+                                                                                                       name="subject"
+                                                                                                       value="Logic">
+                                                                                                Logic
+
+                                                                                            </li>
+
+                                                                                            <li><input type="checkbox"
+                                                                                                       name="subject"
+                                                                                                       value="Multi Row">
+                                                                                                Multi Row
+
+                                                                                            </li>
+
+                                                                                            <li><input type="checkbox"
+                                                                                                       name="subject"
+                                                                                                       value="Single Row">
+                                                                                                Single Row
+
+                                                                                            </li>
+
+                                                                                        </ul>
+
+                                                                                    </li>
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Record linkage">
+                                                                                        Record linkage
+
+                                                                                    </li>
+
+                                                                                    <li><span
+                                                                                            class="caret"></span><strong><input
+                                                                                            type="checkbox"
+                                                                                            name="subject"
+                                                                                            value="Univariate">
+                                                                                    </strong> Univariate
+
+                                                                                        <ul class="nested tree">
+
+                                                                                            <li><span
+                                                                                                    class="caret"></span><strong><input
+                                                                                                    type="checkbox"
+                                                                                                    name="subject"
+                                                                                                    value="Multi value">
+                                                                                            </strong> Multi value
+
+                                                                                                <ul class="nested tree">
+
+                                                                                                    <li><input
+                                                                                                            type="checkbox"
+                                                                                                            name="subject"
+                                                                                                            value="Aggregate">
+                                                                                                        Aggregate
+
+                                                                                                    </li>
+
+                                                                                                    <li><input
+                                                                                                            type="checkbox"
+                                                                                                            name="subject"
+                                                                                                            value="Order">
+                                                                                                        Order
+
+                                                                                                    </li>
+
+                                                                                                </ul>
+
+                                                                                            </li>
+
+                                                                                            <li><span
+                                                                                                    class="caret"></span><strong><input
+                                                                                                    type="checkbox"
+                                                                                                    name="subject"
+                                                                                                    value="Single value">
+                                                                                            </strong> Single value
+
+                                                                                                <ul class="nested tree">
+
+                                                                                                    <li><input
+                                                                                                            type="checkbox"
+                                                                                                            name="subject"
+                                                                                                            value="Blank">
+                                                                                                        Blank
+
+                                                                                                    </li>
+
+                                                                                                    <li><input
+                                                                                                            type="checkbox"
+                                                                                                            name="subject"
+                                                                                                            value="Range">
+                                                                                                        Range
+
+                                                                                                    </li>
+
+                                                                                                    <li><input
+                                                                                                            type="checkbox"
+                                                                                                            name="subject"
+                                                                                                            value="Valid value">
+                                                                                                        Valid value
+
+                                                                                                    </li>
+
+                                                                                                </ul>
+
+                                                                                            </li>
+
+                                                                                        </ul>
+
+                                                                                    </li>
+
+                                                                                </ul>
+
+                                                                            </li>
+
+                                                                        </ul>
+
+                                                                    </li>
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="Notify Source"> Notify Source
+
+                                                                    </li>
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="Receive Resolution"> Receive
+                                                                        Resolution
+
+                                                                    </li>
+
+                                                                    <li><span class="caret"></span><strong><input
+                                                                            type="checkbox" name="subject"
+                                                                            value="Resolve Discrepancy"> </strong>
+                                                                        Resolve Discrepancy
+
+                                                                        <ul class="nested tree">
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Add Data"> Add Data
+
+                                                                            </li>
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Confirm Data"> Confirm
+                                                                                Data
+
+                                                                            </li>
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Delete Data"> Delete Data
+
+                                                                            </li>
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Update Data"> Update Data
+
+                                                                            </li>
+
+                                                                        </ul>
+
+                                                                    </li>
+
+                                                                </ul>
+
+                                                            </li>
+
+                                                            <li><span class="caret"></span><strong><input
+                                                                    type="checkbox" name="subject" value="Code">
+                                                            </strong> Code
+
+                                                                <ul class="nested tree">
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="Auto"> Auto
+
+                                                                    </li>
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="Manual"> Manual
+
+                                                                    </li>
+
+                                                                </ul>
+
+                                                            </li>
+
+                                                            <li><span class="caret"></span><strong><input
+                                                                    type="checkbox" name="subject" value="Data Entry">
+                                                            </strong> Data Entry
+
+                                                                <ul class="nested tree">
+
+                                                                    <li><span class="caret"></span><strong><input
+                                                                            type="checkbox" name="subject"
+                                                                            value="Import"> </strong> Import
+
+                                                                        <ul class="nested tree">
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Cumulative"> Cumulative
+
+                                                                            </li>
+
+                                                                            <li><span
+                                                                                    class="caret"></span><strong><input
+                                                                                    type="checkbox" name="subject"
+                                                                                    value="Incremental"> </strong>
+                                                                                Incremental
+
+                                                                                <ul class="nested tree">
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Batch"> Batch
+
+                                                                                    </li>
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Messaging">
+                                                                                        Messaging
+
+                                                                                    </li>
+
+                                                                                </ul>
+
+                                                                            </li>
+
+                                                                        </ul>
+
+                                                                    </li>
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="IVRS"> IVRS
+
+                                                                    </li>
+
+                                                                    <li><span class="caret"></span><strong><input
+                                                                            type="checkbox" name="subject"
+                                                                            value="Key Entry"> </strong> Key Entry
+
+                                                                        <ul class="nested tree">
+
+                                                                            <li><span
+                                                                                    class="caret"></span><strong><input
+                                                                                    type="checkbox" name="subject"
+                                                                                    value="Double"> </strong> Double
+
+                                                                                <ul class="nested tree">
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Blind"> Blind
+
+                                                                                    </li>
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Independent">
+                                                                                        Independent
+
+                                                                                    </li>
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Interactive">
+                                                                                        Interactive
+
+                                                                                    </li>
+
+                                                                                </ul>
+
+                                                                            </li>
+
+                                                                            <li><span
+                                                                                    class="caret"></span><strong><input
+                                                                                    type="checkbox" name="subject"
+                                                                                    value="Single"> </strong> Single
+
+                                                                                <ul class="nested tree">
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Central"> Central
+
+                                                                                    </li>
+
+                                                                                    <li><input type="checkbox"
+                                                                                               name="subject"
+                                                                                               value="Remote (in the field)">
+                                                                                        Remote (in the field)
+
+                                                                                    </li>
+
+                                                                                </ul>
+
+                                                                            </li>
+
+                                                                        </ul>
+
+                                                                    </li>
+
+                                                                    <li><span class="caret"></span><strong><input
+                                                                            type="checkbox" name="subject"
+                                                                            value="Optical Scan"> </strong> Optical Scan
+
+                                                                        <ul class="nested tree">
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Barcode"> Barcode
+
+                                                                            </li>
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="ICR"> ICR
+
+                                                                            </li>
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="OCR"> OCR
+
+                                                                            </li>
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Optical mark recognition (OMR)">
+                                                                                Optical mark recognition (OMR)
+
+                                                                            </li>
+
+                                                                        </ul>
+
+                                                                    </li>
+
+                                                                </ul>
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject" value="Export">
+                                                                Export
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Integrate (reconcile)"> Integrate
+                                                                (reconcile)
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject" value="Transform">
+                                                                Transform
+
+                                                            </li>
+
+                                                        </ul>
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject" value="Query Database">
+                                                        Query Database
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject" value="Report Status">
+                                                        Report Status
+
+                                                    </li>
+
+                                                    <li><span class="caret"></span><strong><input type="checkbox"
+                                                                                                  name="subject"
+                                                                                                  value="Secure Data">
+                                                    </strong> Secure Data
+
+                                                        <ul class="nested tree">
+
+                                                            <li><span class="caret"></span><strong><input
+                                                                    type="checkbox" name="subject"
+                                                                    value="Manage Accounts"> </strong> Manage Accounts
+
+                                                                <ul class="nested tree">
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="Grant Access"> Grant Access
+
+                                                                    </li>
+
+                                                                    <li><input type="checkbox" name="subject"
+                                                                               value="Restrict Access"> Restrict Access
+
+                                                                    </li>
+
+                                                                    <li><span class="caret"></span><strong><input
+                                                                            type="checkbox" name="subject"
+                                                                            value="Revoke Access"> </strong> Revoke
+                                                                        Access
+
+                                                                        <ul class="nested tree">
+
+                                                                            <li><input type="checkbox" name="subject"
+                                                                                       value="Lock Database"> Lock
+                                                                                Database
+
+                                                                            </li>
+
+                                                                        </ul>
+
+                                                                    </li>
+
+                                                                </ul>
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Separate Duties"> Separate Duties
+
+                                                            </li>
+
+                                                        </ul>
+
+                                                    </li>
+
+                                                    <li><input type="checkbox" name="subject"
+                                                               value="Store Data, Metadata"> Store Data, Metadata
+
+                                                    </li>
+
+                                                    <li><span class="caret"></span><strong><input type="checkbox"
+                                                                                                  name="subject"
+                                                                                                  value="Track Data">
+                                                    </strong> Track Data
+
+                                                        <ul class="nested tree">
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Record Data Changes"> Record Data Changes
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Record Provenance"> Record Provenance
+
+                                                            </li>
+
+                                                            <li><input type="checkbox" name="subject"
+                                                                       value="Record State"> Record State
+
+                                                            </li>
+
+                                                        </ul>
+
+                                                    </li>
+
+                                                </ul>
+
+                                            </li>
+
+                                        </ul>
+                                        <input id="id_keywords" type="hidden" name="keywords">
+                                        <p class="help-text">
+                                            Press the Caret (&gt;) to view child subjects.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% endif %}
+                    </div>
+
+                    <div class="clearfix"></div>
+
+
+                    {% include "admin/elements/submission/additional_fields.html" with form=form additional_fields=additional_fields %}
+
+                    <div class="large-12 columns">
+                        <button class="success button pull-right" type="submit" name="start_submission"><i
+                                class="fa fa-check">&nbsp;</i>{% trans "Save and Continue" %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </article>
+
+    <!-- License information modal -->
+    <div id="license" class="reveal" data-reveal aria-labelledby="licensetitle" aria-hidden="true"
+         role="dialog">
+        <div class="card">
+            <div class="card-divider">
+                <h2 id="licensetitle">{% trans 'License Information' %}</h2>
+            </div>
+            <div class="card-section">
+                <p>{{ request.journal.name }} {% trans "allows the following licenses for submission" %}:</p>
+                {% include "elements/license_block.html" %}
+            </div>
+        </div>
+        <button class="close-button" data-close aria-label="Close modal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+{% endblock body %}
+
+
+
+{% block js %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="{% static "common/js/jq-ui.min.js" %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var toggler = document.getElementsByClassName("caret");
+            var i;
+
+            for (i = 0; i < toggler.length; i++) {
+                toggler[i].addEventListener("click", function () {
+                    this.parentElement.querySelector(".nested").classList.toggle("active");
+                    this.classList.toggle("caret-down");
+                });
+            }
+        })
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            // listen for changes on the checkboxes
+            $('input[name="subject"]').change(function () {
+                // have an empty array to store the values in
+                let values = [];
+                // check each checked checkbox and store the value in array
+                $.each($('input[name="subject"]:checked'), function () {
+                    values.push($(this).val());
+                });
+                // convert the array to string and store the value in hidden input field
+                $('#id_keywords').val(values.toString());
+            });
+        });
+    </script>
+    {% include "elements/jqte.html" %}
+    {% include 'elements/fundref/fundref.html' %}
+
+{% endblock %}
